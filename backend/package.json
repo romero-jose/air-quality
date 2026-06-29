@@ -21,10 +21,13 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@fastify/cors": "^11.2.0",
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^1.0.0-rc.4",
-    "postgres": "^3.4.9"
+    "fastify": "^5.9.0",
+    "postgres": "^3.4.9",
+    "zod": "^4.4.3"
   },
   "allowScripts": {
     "esbuild@0.25.12": true,

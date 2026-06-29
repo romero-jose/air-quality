@@ -1,0 +1,63 @@
+import type { Db } from "../db/client.js";
+import { ingestSincaReadings } from "./sinca.js";
+
+const DEFAULT_INGESTION_INTERVAL_MS = 15 * 60 * 1000;
+
+export type IngestionWorker = {
+  stop: () => void;
+};
+
+const getIngestionIntervalMs = () => {
+  const raw = process.env.INGESTION_INTERVAL_MS;
+  if (!raw) return DEFAULT_INGESTION_INTERVAL_MS;
+
+  const interval = Number(raw);
+  if (!Number.isFinite(interval) || interval <= 0) {
+    throw new Error("INGESTION_INTERVAL_MS must be a positive number");
+  }
+
+  return interval;
+};
+
+export const runIngestion = async (db: Db) => {
+  const startedAt = new Date();
+  console.log(`[ingestion] started at ${startedAt.toISOString()}`);
+
+  const result = await ingestSincaReadings(db);
+
+  console.log(
+    `[ingestion] finished: stations=${result.stations} scraped=${result.scrapedReadings} written=${result.writtenReadings} failed=${result.failedStations.length}`,
+  );
+
+  for (const failure of result.failedStations) {
+    console.error(`[ingestion] station ${failure.code} failed: ${failure.error}`);
+  }
+};
+
+export const startIngestionWorker = async (db: Db) => {
+  let ingestionRunning = false;
+
+  await runIngestion(db);
+
+  const interval = setInterval(() => {
+    if (ingestionRunning) {
+      console.warn("[ingestion] previous run is still active; skipping this tick");
+      return;
+    }
+
+    ingestionRunning = true;
+    runIngestion(db)
+      .catch((error: unknown) => {
+        console.error("[ingestion] unexpected failure:", error);
+      })
+      .finally(() => {
+        ingestionRunning = false;
+      });
+  }, getIngestionIntervalMs());
+
+  return {
+    stop: () => {
+      clearInterval(interval);
+    },
+  };
+};
