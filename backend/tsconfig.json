@@ -1,12 +1,23 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "esModuleInterop": true,
-    "target": "es6",
-    "moduleResolution": "nodenext",
-    "sourceMap": true,
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "outDir": "dist",
     "rootDir": "src",
-    "outDir": "dist"
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": false,
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "types": ["node"]
   },
-  "lib": ["es2015"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
