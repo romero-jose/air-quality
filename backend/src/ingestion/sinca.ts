@@ -1,8 +1,8 @@
 import { sql } from "drizzle-orm";
-import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
 import { readings, stations, type NewReading } from "../db/schema.js";
 import { fetchStationReadings } from "../scraper/sinca.js";
+import { Db } from "../db/client.js";
 
 export type IngestionResult = {
   stations: number;
@@ -13,8 +13,6 @@ export type IngestionResult = {
     error: string;
   }>;
 };
-
-type Db = PostgresJsDatabase<Record<string, never>>;
 
 function toReadingValues(
   stationId: number,
