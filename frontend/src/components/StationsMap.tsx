@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -49,11 +50,19 @@ export const StationsMap = () => {
   }, [stationsResult.data]);
 
   if (stationsResult.isLoading) {
-    return <div role="status" aria-live="polite">Loading map…</div>;
+    return (
+      <div role="status" aria-live="polite">
+        Loading map…
+      </div>
+    );
   }
 
   if (stationsResult.isError) {
-    return <div role="alert">Couldn't load station data: {stationsResult.error.message}</div>;
+    return (
+      <div role="alert">
+        Couldn't load station data: {stationsResult.error.message}
+      </div>
+    );
   }
 
   return (
@@ -78,13 +87,19 @@ export const StationsMap = () => {
             icon={createMarkerIcon(status)}
           >
             <Popup>
-              <strong>{station.name}</strong> ({station.code})
+              <Link
+                to={`/stations/$stationCode`}
+                params={{ stationCode: station.code }}
+              >
+                <strong>{station.name}</strong> ({station.code})
+              </Link>
               <br />
               {latest ? (
                 <>
                   {formatDateTime(latest)}
                   <br />
-                  PM2.5: {formatValue(value)} {pollutantMeta.pm25.unit} — {statusLabels[status]}
+                  PM2.5: {formatValue(value)} {pollutantMeta.pm25.unit} —{" "}
+                  {statusLabels[status]}
                 </>
               ) : (
                 "No readings available"
