@@ -1,0 +1,12 @@
+.station-marker-dot {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+.station-marker-dot[data-status="good"] { background: #2e7d32; }
+.station-marker-dot[data-status="caution"] { background: #f9a825; }
+.station-marker-dot[data-status="unhealthy"] { background: #c62828; }
+.station-marker-dot[data-status="missing"] { background: #9e9e9e; }
