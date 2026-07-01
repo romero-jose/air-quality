@@ -1,19 +1,37 @@
 import { useQuery } from "@tanstack/react-query";
 import { readingsQuery } from "../api/queries";
 import {
-  pollutantKeys,
   pollutantMeta,
   getReadingValue,
   getStatus,
-  formatDateTime,
   type Reading,
 } from "../api/airQuality";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
+import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
+import { Skeleton } from "./ui/skeleton";
+import { cn } from "../lib/utils";
 
 const statusLabels: Record<ReturnType<typeof getStatus>, string> = {
   good: "Good",
   caution: "Caution",
   unhealthy: "Unhealthy",
   missing: "No data",
+};
+
+const statusClassName: Record<ReturnType<typeof getStatus>, string> = {
+  good: "",
+  caution: "font-semibold",
+  unhealthy: "font-semibold text-destructive",
+  missing: "text-muted-foreground",
 };
 
 function formatValue(value: number | null) {
@@ -27,79 +45,101 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
     const station = result.data?.[0];
 
     if (!station) {
-      return <div>No station found for code "{stationCode}".</div>;
+      return (
+        <Alert>
+          <AlertTitle>Station not found</AlertTitle>
+          <AlertDescription>
+            No station found for code "{stationCode}".
+          </AlertDescription>
+        </Alert>
+      );
     }
 
     if (!station.readings[0]) {
       return (
-        <div>
-          <h4>
-            {station.name} ({station.code})
-          </h4>
-          <p>No readings available for this station.</p>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {station.name} ({station.code})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-muted-foreground">
+            No readings available for this station.
+          </CardContent>
+        </Card>
       );
     }
 
     return (
-      <div>
-        <header>
-          <h4>
+      <Card>
+        <CardHeader>
+          <CardTitle>
             {station.name} ({station.code})
-          </h4>
+          </CardTitle>
           {station.lat !== null && station.lon !== null && (
-            <p>
+            <CardDescription>
               {station.lat.toFixed(4)}, {station.lon.toFixed(4)}
-            </p>
+            </CardDescription>
           )}
-        </header>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableCaption>Recent readings for {station.name}</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Hour</TableHead>
+                <TableHead className="text-right">
+                  {pollutantMeta.pm25.label} ({pollutantMeta.pm25.unit})
+                </TableHead>
+                <TableHead>Preliminary</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {station.readings.map((reading: Reading) => {
+                const value = getReadingValue(reading, "pm25");
+                const status = getStatus(value, "pm25");
 
-        <table>
-          <caption>Recent readings for {station.name}</caption>
-          <thead>
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">Hour</th>
-              {pollutantKeys.map((key) => (
-                <th key={key} scope="col">
-                  {pollutantMeta[key].label} ({pollutantMeta[key].unit})
-                </th>
-              ))}
-              <th scope="col">Preliminary</th>
-            </tr>
-          </thead>
-          <tbody>
-            {station.readings.map((reading: Reading) => (
-              <tr key={reading.id}>
-                <td>{reading.date}</td>
-                <td>{reading.hour.slice(0, 5)}</td>
-                {pollutantKeys.map((key) => {
-                  const value = getReadingValue(reading, key);
-                  const status = getStatus(value, key);
-                  return (
-                    <td key={key} data-status={status}>
+                return (
+                  <TableRow key={reading.id}>
+                    <TableCell>{reading.date}</TableCell>
+                    <TableCell>{reading.hour.slice(0, 5)}</TableCell>
+                    <TableCell
+                      className={cn("text-right", statusClassName[status])}
+                      title={statusLabels[status]}
+                    >
                       {formatValue(value)}
-                    </td>
-                  );
-                })}
-                <td>{reading.preliminary ? "Yes" : "No"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    </TableCell>
+                    <TableCell>{reading.preliminary ? "Yes" : "No"}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     );
   }
 
   if (result.isError) {
     return (
-      <div role="alert">Couldn't load readings: {result.error.message}</div>
+      <Alert variant="destructive">
+        <AlertTitle>Couldn't load readings</AlertTitle>
+        <AlertDescription>{result.error.message}</AlertDescription>
+      </Alert>
     );
   }
 
   return (
-    <div role="status" aria-live="polite">
-      Loading station data…
-    </div>
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-5 w-48" />
+      </CardHeader>
+      <CardContent className="flex flex-col gap-2">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Skeleton key={index} className="h-6 w-full" />
+        ))}
+      </CardContent>
+    </Card>
   );
 };

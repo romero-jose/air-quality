@@ -12,6 +12,9 @@ import {
   pollutantMeta,
   type StationReadings,
 } from "../api/airQuality";
+import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
+import { Badge } from "./ui/badge";
+import { Skeleton } from "./ui/skeleton";
 
 import "../styles/map.css";
 
@@ -25,16 +28,30 @@ const statusLabels: Record<ReturnType<typeof getStatus>, string> = {
   missing: "No data",
 };
 
+const statusBadgeVariant: Record<
+  ReturnType<typeof getStatus>,
+  "secondary" | "default" | "destructive" | "outline"
+> = {
+  good: "secondary",
+  caution: "default",
+  unhealthy: "destructive",
+  missing: "outline",
+};
+
 function formatValue(value: number | null) {
   return value === null ? "—" : value.toFixed(1);
 }
 
-function createMarkerIcon(status: ReturnType<typeof getStatus>) {
+function formatMarkerValue(value: number | null) {
+  return value === null ? "—" : Math.round(value).toString();
+}
+
+function createMarkerIcon(status: ReturnType<typeof getStatus>, value: number | null) {
   return L.divIcon({
     className: "station-marker",
-    html: `<span class="station-marker-dot" data-status="${status}"></span>`,
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
+    html: `<span class="station-marker-value" data-status="${status}">${formatMarkerValue(value)}</span>`,
+    iconSize: [36, 22],
+    iconAnchor: [18, 11],
   });
 }
 
@@ -50,18 +67,15 @@ export const StationsMap = () => {
   }, [stationsResult.data]);
 
   if (stationsResult.isLoading) {
-    return (
-      <div role="status" aria-live="polite">
-        Loading map…
-      </div>
-    );
+    return <Skeleton className="h-[500px] w-full" role="status" aria-live="polite" />;
   }
 
   if (stationsResult.isError) {
     return (
-      <div role="alert">
-        Couldn't load station data: {stationsResult.error.message}
-      </div>
+      <Alert variant="destructive">
+        <AlertTitle>Couldn't load station data</AlertTitle>
+        <AlertDescription>{stationsResult.error.message}</AlertDescription>
+      </Alert>
     );
   }
 
@@ -69,7 +83,7 @@ export const StationsMap = () => {
     <MapContainer
       center={SANTIAGO_CENTER}
       zoom={DEFAULT_ZOOM}
-      style={{ height: "500px", width: "100%" }}
+      className="h-[500px] w-full overflow-hidden rounded-2xl"
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -84,25 +98,30 @@ export const StationsMap = () => {
           <Marker
             key={station.id}
             position={[station.lat, station.lon]}
-            icon={createMarkerIcon(status)}
+            icon={createMarkerIcon(status, value)}
           >
             <Popup>
               <Link
                 to={`/stations/$stationCode`}
                 params={{ stationCode: station.code }}
+                className="font-medium hover:underline"
               >
-                <strong>{station.name}</strong> ({station.code})
+                {station.name} ({station.code})
               </Link>
-              <br />
               {latest ? (
-                <>
-                  {formatDateTime(latest)}
-                  <br />
-                  PM2.5: {formatValue(value)} {pollutantMeta.pm25.unit} —{" "}
-                  {statusLabels[status]}
-                </>
+                <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span>
+                    {formatDateTime(latest)} · PM2.5 {formatValue(value)}{" "}
+                    {pollutantMeta.pm25.unit}
+                  </span>
+                  <Badge variant={statusBadgeVariant[status]}>
+                    {statusLabels[status]}
+                  </Badge>
+                </div>
               ) : (
-                "No readings available"
+                <p className="mt-1 text-xs text-muted-foreground">
+                  No readings available
+                </p>
               )}
             </Popup>
           </Marker>

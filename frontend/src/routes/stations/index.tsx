@@ -7,8 +7,8 @@ export const Route = createFileRoute("/stations/")({
 
 function RouteComponent() {
   return (
-    <div className="p-2">
-      <h3>Santiago Air Quality</h3>
+    <div className="flex flex-col gap-4">
+      <h1 className="font-heading text-xl font-semibold">Stations</h1>
       <StationList />
     </div>
   );
