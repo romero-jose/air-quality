@@ -1,7 +1,7 @@
 import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { buttonVariants } from "../components/ui/button";
-import { cn } from "../lib/utils";
+import { cn } from "../utils/styling";
 
 const navLinkClassName = cn(
   buttonVariants({ variant: "ghost" }),
