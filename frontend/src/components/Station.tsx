@@ -9,7 +9,7 @@ import {
   getStatus,
   type Reading,
 } from "../api/airQuality";
-import { MAP_STYLE } from "../constants/map";
+import { MAP_STYLE } from "../constants/map"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import {
   Table,
@@ -24,15 +24,9 @@ import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Skeleton } from "./ui/skeleton";
 import { Badge } from "./ui/badge";
 import { cn } from "../utils/styling";
+import { statusLabels } from "@/constants/readings";
 
-type Status = ReturnType<typeof getStatus>;
-
-const statusLabels: Record<Status, string> = {
-  good: "Good",
-  caution: "Caution",
-  unhealthy: "Unhealthy",
-  missing: "No data",
-};
+export type Status = ReturnType<typeof getStatus>;
 
 function StatusBadge({ status }: { status: Status }) {
   return (

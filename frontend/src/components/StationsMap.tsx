@@ -13,20 +13,12 @@ import {
 } from "../api/airQuality";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Skeleton } from "./ui/skeleton";
-import { MAP_STYLE } from "../constants/map";
+import { MAP_STYLE, SANTIAGO_CENTER } from "../constants/map";
+import { statusLabels } from "@/constants/readings";
 import "../styles/map.css";
-
-const SANTIAGO_CENTER = { longitude: -70.6693, latitude: -33.4489, zoom: 11 };
 
 type Status = ReturnType<typeof getStatus>;
 type LocatedStation = StationReadings & { lat: number; lon: number };
-
-const statusLabels: Record<Status, string> = {
-  good: "Good",
-  caution: "Caution",
-  unhealthy: "Unhealthy",
-  missing: "No data",
-};
 
 const legendOrder: Status[] = ["good", "caution", "unhealthy", "missing"];
 
