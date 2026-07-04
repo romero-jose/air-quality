@@ -13,13 +13,10 @@ import {
 } from "../api/airQuality";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Skeleton } from "./ui/skeleton";
-
+import { MAP_STYLE } from "../constants/map";
 import "../styles/map.css";
 
 const SANTIAGO_CENTER = { longitude: -70.6693, latitude: -33.4489, zoom: 11 };
-
-const MAP_STYLE =
-  "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 
 type Status = ReturnType<typeof getStatus>;
 type LocatedStation = StationReadings & { lat: number; lon: number };
@@ -43,7 +40,9 @@ function formatMarkerValue(value: number | null) {
 
 export const StationsMap = () => {
   const stationsResult = useQuery(readingsQuery({ limit: 1 }));
-  const [selectedStationId, setSelectedStationId] = useState<number | null>(null);
+  const [selectedStationId, setSelectedStationId] = useState<number | null>(
+    null,
+  );
 
   const stationsWithLocation = useMemo(() => {
     if (!stationsResult.data) return [];
@@ -55,7 +54,9 @@ export const StationsMap = () => {
 
   const selectedStation = useMemo(
     () =>
-      stationsWithLocation.find((station) => station.id === selectedStationId) ?? null,
+      stationsWithLocation.find(
+        (station) => station.id === selectedStationId,
+      ) ?? null,
     [stationsWithLocation, selectedStationId],
   );
 

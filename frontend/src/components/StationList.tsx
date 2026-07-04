@@ -5,7 +5,7 @@ import { Card, CardContent } from "./ui/card";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
 import { Skeleton } from "./ui/skeleton";
 import { buttonVariants } from "./ui/button";
-import { cn } from "../lib/utils";
+import { cn } from "../utils/styling";
 
 const stationLinkClassName = cn(
     buttonVariants({ variant: "ghost" }),
