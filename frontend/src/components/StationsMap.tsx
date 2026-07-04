@@ -1,61 +1,60 @@
-import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
-import { Map, Marker, Popup, NavigationControl } from "react-map-gl/maplibre";
-import "maplibre-gl/dist/maplibre-gl.css";
-import { readingsQuery } from "../api/queries";
+import { useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
+import { Map, Marker, Popup, NavigationControl } from 'react-map-gl/maplibre'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import { readingsQuery } from '../api/queries'
 import {
   getReadingValue,
   getStatus,
   formatDateTime,
   pollutantMeta,
   type StationReadings,
-} from "../api/airQuality";
-import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
-import { Skeleton } from "./ui/skeleton";
-import { MAP_STYLE, SANTIAGO_CENTER } from "../constants/map";
-import { statusLabels } from "@/constants/readings";
-import "../styles/map.css";
+} from '../api/airQuality'
+import { Alert, AlertTitle, AlertDescription } from './ui/alert'
+import { Skeleton } from './ui/skeleton'
+import { MAP_STYLE, SANTIAGO_CENTER } from '../constants/map'
+import { statusLabels } from '@/constants/readings'
+import '../styles/map.css'
 
-type Status = ReturnType<typeof getStatus>;
-type LocatedStation = StationReadings & { lat: number; lon: number };
+type Status = ReturnType<typeof getStatus>
+type LocatedStation = StationReadings & { lat: number; lon: number }
 
-const legendOrder: Status[] = ["good", "caution", "unhealthy", "missing"];
+const legendOrder: Status[] = ['good', 'caution', 'unhealthy', 'missing']
 
 function formatValue(value: number | null) {
-  return value === null ? "—" : value.toFixed(1);
+  return value === null ? '—' : value.toFixed(1)
 }
 
 function formatMarkerValue(value: number | null) {
-  return value === null ? "—" : Math.round(value).toString();
+  return value === null ? '—' : Math.round(value).toString()
 }
 
 export const StationsMap = () => {
-  const stationsResult = useQuery(readingsQuery({ limit: 1 }));
+  const stationsResult = useQuery(readingsQuery({ limit: 1 }))
   const [selectedStationId, setSelectedStationId] = useState<number | null>(
     null,
-  );
+  )
 
   const stationsWithLocation = useMemo(() => {
-    if (!stationsResult.data) return [];
+    if (!stationsResult.data) return []
     return stationsResult.data.filter(
       (station): station is LocatedStation =>
         station.lat !== null && station.lon !== null,
-    );
-  }, [stationsResult.data]);
+    )
+  }, [stationsResult.data])
 
   const selectedStation = useMemo(
     () =>
-      stationsWithLocation.find(
-        (station) => station.id === selectedStationId,
-      ) ?? null,
+      stationsWithLocation.find(station => station.id === selectedStationId) ??
+      null,
     [stationsWithLocation, selectedStationId],
-  );
+  )
 
   if (stationsResult.isLoading) {
     return (
       <Skeleton className="h-[500px] w-full" role="status" aria-live="polite" />
-    );
+    )
   }
 
   if (stationsResult.isError) {
@@ -64,7 +63,7 @@ export const StationsMap = () => {
         <AlertTitle>Couldn't load station data</AlertTitle>
         <AlertDescription>{stationsResult.error.message}</AlertDescription>
       </Alert>
-    );
+    )
   }
 
   return (
@@ -72,15 +71,15 @@ export const StationsMap = () => {
       <Map
         initialViewState={SANTIAGO_CENTER}
         mapStyle={MAP_STYLE}
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: '100%', height: '100%' }}
         onClick={() => setSelectedStationId(null)}
       >
         <NavigationControl position="top-right" showCompass={false} />
 
-        {stationsWithLocation.map((station) => {
-          const latest = station.readings[0];
-          const value = latest ? getReadingValue(latest, "pm25") : null;
-          const status = getStatus(value, "pm25");
+        {stationsWithLocation.map(station => {
+          const latest = station.readings[0]
+          const value = latest ? getReadingValue(latest, 'pm25') : null
+          const status = getStatus(value, 'pm25')
 
           return (
             <Marker
@@ -88,9 +87,9 @@ export const StationsMap = () => {
               longitude={station.lon}
               latitude={station.lat}
               anchor="bottom"
-              onClick={(event) => {
-                event.originalEvent.stopPropagation();
-                setSelectedStationId(station.id);
+              onClick={event => {
+                event.originalEvent.stopPropagation()
+                setSelectedStationId(station.id)
               }}
             >
               <button
@@ -100,7 +99,7 @@ export const StationsMap = () => {
                 data-active={selectedStationId === station.id}
                 aria-label={`${station.name}: PM2.5 ${formatValue(value)} ${pollutantMeta.pm25.unit}, ${statusLabels[status]}`}
               >
-                {status === "unhealthy" && (
+                {status === 'unhealthy' && (
                   <span className="station-marker-pulse" aria-hidden="true" />
                 )}
                 <span className="station-marker-value">
@@ -108,7 +107,7 @@ export const StationsMap = () => {
                 </span>
               </button>
             </Marker>
-          );
+          )
         })}
 
         {selectedStation && (
@@ -133,19 +132,19 @@ export const StationsMap = () => {
 
       <MapLegend />
     </div>
-  );
-};
+  )
+}
 
 function StationPopupContent({
   station,
   onClose,
 }: {
-  station: LocatedStation;
-  onClose: () => void;
+  station: LocatedStation
+  onClose: () => void
 }) {
-  const latest = station.readings[0];
-  const value = latest ? getReadingValue(latest, "pm25") : null;
-  const status = getStatus(value, "pm25");
+  const latest = station.readings[0]
+  const value = latest ? getReadingValue(latest, 'pm25') : null
+  const status = getStatus(value, 'pm25')
 
   return (
     <div className="station-popup-card">
@@ -181,18 +180,18 @@ function StationPopupContent({
         <p className="station-popup-empty">No readings available</p>
       )}
     </div>
-  );
+  )
 }
 
 function MapLegend() {
   return (
     <div className="map-legend">
-      {legendOrder.map((status) => (
+      {legendOrder.map(status => (
         <div key={status} className="map-legend-item">
           <span className="map-legend-dot" data-status={status} />
           {statusLabels[status]}
         </div>
       ))}
     </div>
-  );
+  )
 }

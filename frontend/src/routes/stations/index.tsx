@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { StationList } from "../../components/StationList";
+import { createFileRoute } from '@tanstack/react-router'
+import { StationList } from '../../components/StationList'
 
-export const Route = createFileRoute("/stations/")({
+export const Route = createFileRoute('/stations/')({
   component: RouteComponent,
-});
+})
 
 function RouteComponent() {
   return (
@@ -11,5 +11,5 @@ function RouteComponent() {
       <h1 className="font-heading text-xl font-semibold">Stations</h1>
       <StationList />
     </div>
-  );
+  )
 }

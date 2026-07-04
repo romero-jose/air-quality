@@ -1,16 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-import { Map, Marker } from "react-map-gl/maplibre";
-import { MapPin } from "lucide-react";
-import "maplibre-gl/dist/maplibre-gl.css";
-import { readingsQuery } from "../api/queries";
+import { useQuery } from '@tanstack/react-query'
+import { Map, Marker } from 'react-map-gl/maplibre'
+import { MapPin } from 'lucide-react'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import { readingsQuery } from '../api/queries'
 import {
   pollutantMeta,
   getReadingValue,
   getStatus,
   type Reading,
-} from "../api/airQuality";
-import { MAP_STYLE } from "../constants/map"
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+} from '../api/airQuality'
+import { MAP_STYLE } from '../constants/map'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import {
   Table,
   TableBody,
@@ -19,34 +19,34 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table";
-import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
-import { Skeleton } from "./ui/skeleton";
-import { Badge } from "./ui/badge";
-import { cn } from "../utils/styling";
-import { statusLabels } from "@/constants/readings";
+} from './ui/table'
+import { Alert, AlertTitle, AlertDescription } from './ui/alert'
+import { Skeleton } from './ui/skeleton'
+import { Badge } from './ui/badge'
+import { cn } from '../utils/styling'
+import { statusLabels } from '@/constants/readings'
 
-export type Status = ReturnType<typeof getStatus>;
+export type Status = ReturnType<typeof getStatus>
 
 function StatusBadge({ status }: { status: Status }) {
   return (
     <Badge
-      variant={status === "unhealthy" ? "destructive" : "outline"}
+      variant={status === 'unhealthy' ? 'destructive' : 'outline'}
       className={cn(
-        status === "good" &&
-          "border-emerald-600 text-emerald-700 dark:text-emerald-400",
-        status === "caution" &&
-          "border-amber-500 text-amber-700 dark:text-amber-400",
-        status === "missing" && "text-muted-foreground",
+        status === 'good' &&
+          'border-emerald-600 text-emerald-700 dark:text-emerald-400',
+        status === 'caution' &&
+          'border-amber-500 text-amber-700 dark:text-amber-400',
+        status === 'missing' && 'text-muted-foreground',
       )}
     >
       {statusLabels[status]}
     </Badge>
-  );
+  )
 }
 
 function formatValue(value: number | null) {
-  return value === null ? "—" : value.toFixed(1);
+  return value === null ? '—' : value.toFixed(1)
 }
 
 function StationLocationMap({ lat, lon }: { lat: number; lon: number }) {
@@ -54,7 +54,7 @@ function StationLocationMap({ lat, lon }: { lat: number; lon: number }) {
     <Map
       initialViewState={{ longitude: lon, latitude: lat, zoom: 11 }}
       mapStyle={MAP_STYLE}
-      style={{ width: "100%", height: "100%" }}
+      style={{ width: '100%', height: '100%' }}
       interactive={false}
       dragPan={false}
       scrollZoom={false}
@@ -70,7 +70,7 @@ function StationLocationMap({ lat, lon }: { lat: number; lon: number }) {
         />
       </Marker>
     </Map>
-  );
+  )
 }
 
 function CurrentConditions({
@@ -79,14 +79,14 @@ function CurrentConditions({
   lat,
   lon,
 }: {
-  stationName: string;
-  reading: Reading;
-  lat: number | null;
-  lon: number | null;
+  stationName: string
+  reading: Reading
+  lat: number | null
+  lon: number | null
 }) {
-  const value = getReadingValue(reading, "pm25");
-  const status = getStatus(value, "pm25");
-  const hasLocation = lat !== null && lon !== null;
+  const value = getReadingValue(reading, 'pm25')
+  const status = getStatus(value, 'pm25')
+  const hasLocation = lat !== null && lon !== null
 
   return (
     <Card className="overflow-hidden p-0">
@@ -110,14 +110,14 @@ function CurrentConditions({
         )}
       </div>
     </Card>
-  );
+  )
 }
 
 export const Station = ({ stationCode }: { stationCode: string }) => {
-  const result = useQuery(readingsQuery({ stationCode, limit: 10 }));
+  const result = useQuery(readingsQuery({ stationCode, limit: 10 }))
 
   if (result.data) {
-    const station = result.data[0];
+    const station = result.data[0]
 
     if (!station) {
       return (
@@ -127,10 +127,10 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
             No station found for code "{stationCode}".
           </AlertDescription>
         </Alert>
-      );
+      )
     }
 
-    const latest = station.readings.filter((r) => r.pm25 !== null)[0] || null;
+    const latest = station.readings.filter(r => r.pm25 !== null)[0] || null
 
     if (!latest) {
       return (
@@ -144,7 +144,7 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
             No readings available for this station.
           </CardContent>
         </Card>
-      );
+      )
     }
 
     return (
@@ -178,8 +178,8 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
               </TableHeader>
               <TableBody>
                 {station.readings.map((reading: Reading) => {
-                  const value = getReadingValue(reading, "pm25");
-                  const status = getStatus(value, "pm25");
+                  const value = getReadingValue(reading, 'pm25')
+                  const status = getStatus(value, 'pm25')
 
                   return (
                     <TableRow key={reading.id}>
@@ -192,17 +192,17 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
                         <StatusBadge status={status} />
                       </TableCell>
                       <TableCell>
-                        {reading.preliminary ? "Yes" : "No"}
+                        {reading.preliminary ? 'Yes' : 'No'}
                       </TableCell>
                     </TableRow>
-                  );
+                  )
                 })}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
   if (result.isError) {
@@ -211,7 +211,7 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
         <AlertTitle>Couldn't load readings</AlertTitle>
         <AlertDescription>{result.error.message}</AlertDescription>
       </Alert>
-    );
+    )
   }
 
   return (
@@ -225,5 +225,5 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
         ))}
       </CardContent>
     </Card>
-  );
-};
+  )
+}

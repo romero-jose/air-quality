@@ -27,17 +27,17 @@
     box-shadow 0.15s ease;
 }
 
-.station-marker[data-status="good"] {
+.station-marker[data-status='good'] {
   --marker-color: var(--status-good);
 }
-.station-marker[data-status="caution"] {
+.station-marker[data-status='caution'] {
   --marker-color: var(--status-caution);
 }
-.station-marker[data-status="unhealthy"] {
+.station-marker[data-status='unhealthy'] {
   --marker-color: var(--status-unhealthy);
   color: #1c0a0d;
 }
-.station-marker[data-status="missing"] {
+.station-marker[data-status='missing'] {
   --marker-color: var(--status-missing);
 }
 
@@ -46,7 +46,7 @@
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
 }
 
-.station-marker[data-active="true"] {
+.station-marker[data-active='true'] {
   box-shadow:
     0 0 0 3px rgba(255, 255, 255, 0.5),
     0 4px 14px rgba(0, 0, 0, 0.45);
@@ -163,16 +163,16 @@
   color: var(--value-color, #e5e7eb);
 }
 
-.station-popup-value[data-status="good"] {
+.station-popup-value[data-status='good'] {
   --value-color: var(--status-good);
 }
-.station-popup-value[data-status="caution"] {
+.station-popup-value[data-status='caution'] {
   --value-color: var(--status-caution);
 }
-.station-popup-value[data-status="unhealthy"] {
+.station-popup-value[data-status='unhealthy'] {
   --value-color: var(--status-unhealthy);
 }
-.station-popup-value[data-status="missing"] {
+.station-popup-value[data-status='missing'] {
   --value-color: var(--status-missing);
 }
 
@@ -195,16 +195,16 @@
   color: var(--value-color, #9ca3af);
   font-weight: 600;
 }
-.station-popup-status[data-status="good"] {
+.station-popup-status[data-status='good'] {
   --value-color: var(--status-good);
 }
-.station-popup-status[data-status="caution"] {
+.station-popup-status[data-status='caution'] {
   --value-color: var(--status-caution);
 }
-.station-popup-status[data-status="unhealthy"] {
+.station-popup-status[data-status='unhealthy'] {
   --value-color: var(--status-unhealthy);
 }
-.station-popup-status[data-status="missing"] {
+.station-popup-status[data-status='missing'] {
   --value-color: var(--status-missing);
 }
 
@@ -244,15 +244,15 @@
   background: var(--dot-color, var(--status-missing));
 }
 
-.map-legend-dot[data-status="good"] {
+.map-legend-dot[data-status='good'] {
   --dot-color: var(--status-good);
 }
-.map-legend-dot[data-status="caution"] {
+.map-legend-dot[data-status='caution'] {
   --dot-color: var(--status-caution);
 }
-.map-legend-dot[data-status="unhealthy"] {
+.map-legend-dot[data-status='unhealthy'] {
   --dot-color: var(--status-unhealthy);
 }
-.map-legend-dot[data-status="missing"] {
+.map-legend-dot[data-status='missing'] {
   --dot-color: var(--status-missing);
 }
