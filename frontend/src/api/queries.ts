@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 
-import { fetchReadings, type FetchReadingsOptions } from './readings'
+import { type FetchReadingsOptions, fetchReadings } from './readings'
 import { fetchStations } from './stations'
 
 export const stationsQuery = () =>
