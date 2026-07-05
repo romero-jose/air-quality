@@ -2,7 +2,7 @@ import { Map, Marker, NavigationControl, Popup } from 'react-map-gl/maplibre'
 
 import { useMemo, useState } from 'react'
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import { Link } from '@tanstack/react-router'
 
@@ -28,7 +28,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 type LocatedStationReadings = StationReadings & { lat: number; lon: number }
 
 export const StationsMap = () => {
-  const stationsResult = useQuery(readingsQuery({ limit: 1 }))
+  const stationsResult = useSuspenseQuery(readingsQuery({ limit: 1 }))
   const [selectedStationId, setSelectedStationId] = useState<number | null>(
     null,
   )
