@@ -1,6 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 
-import { fetchReadings, fetchStations } from './airQuality'
+import { fetchReadings, type FetchReadingsOptions } from './readings'
+import { fetchStations } from './stations'
 
 export const stationsQuery = () =>
   queryOptions({
@@ -9,12 +10,7 @@ export const stationsQuery = () =>
     staleTime: 1000 * 60 * 10,
   })
 
-export const readingsQuery = (options: {
-  stationCode?: string
-  limit?: number
-  from?: string
-  to?: string
-}) =>
+export const readingsQuery = (options: FetchReadingsOptions) =>
   queryOptions({
     queryKey: ['readings', options],
     queryFn: () => fetchReadings(options),

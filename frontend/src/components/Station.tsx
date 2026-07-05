@@ -1,6 +1,6 @@
 import { Map, Marker } from 'react-map-gl/maplibre'
 
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { MapPin } from 'lucide-react'
 
@@ -8,7 +8,6 @@ import { readingsQuery } from '@/api/queries'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -112,116 +111,91 @@ function CurrentConditions({
 }
 
 export const Station = ({ stationCode }: { stationCode: string }) => {
-  const result = useQuery(readingsQuery({ stationCode, limit: 10 }))
+  const { data: stations } = useSuspenseQuery(
+    readingsQuery({ stationCode, limit: 10 }),
+  )
+  const station = stations[0]
 
-  if (result.data) {
-    const station = result.data[0]
-
-    if (!station) {
-      return (
-        <Alert>
-          <AlertTitle>Station not found</AlertTitle>
-          <AlertDescription>
-            No station found for code "{stationCode}".
-          </AlertDescription>
-        </Alert>
-      )
-    }
-
-    const latest = getLatestPm25Reading(station.readings)
-
-    if (!latest) {
-      return (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {station.name} ({station.code})
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-muted-foreground">
-            No readings available for this station.
-          </CardContent>
-        </Card>
-      )
-    }
-
+  if (!station) {
     return (
-      <div className="flex flex-col gap-4">
-        <CurrentConditions
-          stationName={station.name}
-          reading={latest}
-          lat={station.lat}
-          lon={station.lon}
-        />
-
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {station.name} ({station.code})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableCaption>Recent readings for {station.name}</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Hour</TableHead>
-                  <TableHead className="text-right">
-                    {POLLUTANT_META.pm25.label} ({POLLUTANT_META.pm25.unit})
-                  </TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Preliminary</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {station.readings.map((reading: Reading) => {
-                  const value = reading.pm25
-                  const status = getStatus(value, 'pm25')
-
-                  return (
-                    <TableRow key={reading.id}>
-                      <TableCell>{reading.date}</TableCell>
-                      <TableCell>{reading.hour.slice(0, 5)}</TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {formatValue(value)}
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={status} />
-                      </TableCell>
-                      <TableCell>
-                        {reading.preliminary ? 'Yes' : 'No'}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  if (result.isError) {
-    return (
-      <Alert variant="destructive">
-        <AlertTitle>Couldn't load readings</AlertTitle>
-        <AlertDescription>{result.error.message}</AlertDescription>
+      <Alert>
+        <AlertTitle>Station not found</AlertTitle>
+        <AlertDescription>
+          No station found for code "{stationCode}".
+        </AlertDescription>
       </Alert>
     )
   }
 
+  const latest = getLatestPm25Reading(station.readings)
+
+  if (!latest) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {station.name} ({station.code})
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-muted-foreground">
+          No readings available for this station.
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-5 w-48" />
-      </CardHeader>
-      <CardContent className="flex flex-col gap-2">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Skeleton key={index} className="h-6 w-full" />
-        ))}
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-4">
+      <CurrentConditions
+        stationName={station.name}
+        reading={latest}
+        lat={station.lat}
+        lon={station.lon}
+      />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {station.name} ({station.code})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableCaption>Recent readings for {station.name}</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Hour</TableHead>
+                <TableHead className="text-right">
+                  {POLLUTANT_META.pm25.label} ({POLLUTANT_META.pm25.unit})
+                </TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Preliminary</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {station.readings.map((reading: Reading) => {
+                const value = reading.pm25
+                const status = getStatus(value, 'pm25')
+
+                return (
+                  <TableRow key={reading.id}>
+                    <TableCell>{reading.date}</TableCell>
+                    <TableCell>{reading.hour.slice(0, 5)}</TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {formatValue(value)}
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={status} />
+                    </TableCell>
+                    <TableCell>{reading.preliminary ? 'Yes' : 'No'}</TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

@@ -1,6 +1,4 @@
 import { apiBaseUrl } from '@/config'
-import { readingsResponseSchema } from '@/schemas/reading'
-import { stationsResponseSchema } from '@/schemas/station'
 import { logger } from '@/utils/logger'
 
 const assertResponse = async (response: Response) => {
@@ -12,7 +10,7 @@ const assertResponse = async (response: Response) => {
   return response
 }
 
-const getJson = async (path: string, params?: URLSearchParams) => {
+export const getJson = async (path: string, params?: URLSearchParams) => {
   const url = new URL(path, apiBaseUrl)
   params?.forEach((value, key) => {
     if (value) url.searchParams.set(key, value)
@@ -46,30 +44,4 @@ const getJson = async (path: string, params?: URLSearchParams) => {
 
     throw error
   }
-}
-
-export const fetchStations = async () => {
-  const json = await getJson('/stations')
-  return stationsResponseSchema.parse(json).data
-}
-
-export const fetchReadings = async ({
-  stationCode,
-  from,
-  to,
-  limit = 500,
-}: {
-  stationCode?: string
-  from?: string
-  to?: string
-  limit?: number
-}) => {
-  const params = new URLSearchParams()
-  if (stationCode) params.set('stationCode', stationCode)
-  if (from) params.set('from', from)
-  if (to) params.set('to', to)
-  params.set('limit', String(limit))
-
-  const json = await getJson('/readings', params)
-  return readingsResponseSchema.parse(json).data
 }
