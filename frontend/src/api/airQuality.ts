@@ -1,6 +1,7 @@
 import { apiBaseUrl } from '@/config'
 import { readingsResponseSchema } from '@/schemas/reading'
 import { stationsResponseSchema } from '@/schemas/station'
+import { logger } from '@/utils/logger'
 
 const assertResponse = async (response: Response) => {
   if (!response.ok) {
@@ -17,8 +18,34 @@ const getJson = async (path: string, params?: URLSearchParams) => {
     if (value) url.searchParams.set(key, value)
   })
 
-  const response = await assertResponse(await fetch(url))
-  return response.json() as Promise<unknown>
+  const startedAt = performance.now()
+
+  try {
+    const response = await fetch(url)
+    const durationMs = Math.round(performance.now() - startedAt)
+
+    logger.info('api request', {
+      method: 'GET',
+      path,
+      status: response.status,
+      durationMs,
+    })
+
+    return (await assertResponse(response).then(response =>
+      response.json(),
+    )) as unknown
+  } catch (error) {
+    const durationMs = Math.round(performance.now() - startedAt)
+
+    logger.error('api request failed', {
+      method: 'GET',
+      path,
+      durationMs,
+      error: error instanceof Error ? error.message : String(error),
+    })
+
+    throw error
+  }
 }
 
 export const fetchStations = async () => {
