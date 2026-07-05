@@ -23,6 +23,7 @@ import {
   getLatestPm25Reading,
   getStatus,
 } from '@/utils/readings'
+import 'maplibre-gl/dist/maplibre-gl.css'
 
 type LocatedStationReadings = StationReadings & { lat: number; lon: number }
 

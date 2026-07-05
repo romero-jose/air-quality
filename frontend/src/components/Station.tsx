@@ -28,6 +28,7 @@ import { type Reading } from '@/schemas/reading'
 import { formatValue } from '@/utils/common'
 import { getLatestPm25Reading, getStatus } from '@/utils/readings'
 import { cn } from '@/utils/styling'
+import 'maplibre-gl/dist/maplibre-gl.css'
 
 function StatusBadge({ status }: { status: PollutantStatus }) {
   return (
