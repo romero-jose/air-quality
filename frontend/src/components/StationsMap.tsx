@@ -15,7 +15,6 @@ import {
   POLLUTANT_STATUS,
   POLLUTANT_STATUS_DISPLAY_NAMES,
 } from '@/constants/pollutants'
-import { statusLabels } from '@/constants/readings'
 import type { StationReadings } from '@/schemas/reading'
 import '@/styles/map.css'
 import { formatMarkerValue, formatValue } from '@/utils/common'
@@ -24,7 +23,6 @@ import {
   getLatestPm25Reading,
   getStatus,
 } from '@/utils/readings'
-import 'maplibre-gl/dist/maplibre-gl.css'
 
 type LocatedStationReadings = StationReadings & { lat: number; lon: number }
 
@@ -95,7 +93,7 @@ export const StationsMap = () => {
                 className="station-marker"
                 data-status={status}
                 data-active={selectedStationId === station.id}
-                aria-label={`${station.name}: PM2.5 ${formatValue(value)} ${POLLUTANT_META.pm25.unit}, ${statusLabels[status]}`}
+                aria-label={`${station.name}: PM2.5 ${formatValue(value)} ${POLLUTANT_META.pm25.unit}, ${POLLUTANT_STATUS_DISPLAY_NAMES[status]}`}
               >
                 {status === 'unhealthy' && (
                   <span className="station-marker-pulse" aria-hidden="true" />

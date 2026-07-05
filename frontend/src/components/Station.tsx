@@ -19,16 +19,17 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { MAP_STYLE } from '@/constants/map'
-import { POLLUTANT_META } from '@/constants/pollutants'
-import { statusLabels } from '@/constants/readings'
-import type { Reading } from '@/schemas/reading'
+import {
+  POLLUTANT_META,
+  POLLUTANT_STATUS_DISPLAY_NAMES,
+  type PollutantStatus,
+} from '@/constants/pollutants'
+import { type Reading } from '@/schemas/reading'
+import { formatValue } from '@/utils/common'
 import { getLatestPm25Reading, getStatus } from '@/utils/readings'
 import { cn } from '@/utils/styling'
-import 'maplibre-gl/dist/maplibre-gl.css'
 
-export type Status = ReturnType<typeof getStatus>
-
-function StatusBadge({ status }: { status: Status }) {
+function StatusBadge({ status }: { status: PollutantStatus }) {
   return (
     <Badge
       variant={status === 'unhealthy' ? 'destructive' : 'outline'}
@@ -40,13 +41,9 @@ function StatusBadge({ status }: { status: Status }) {
         status === 'missing' && 'text-muted-foreground',
       )}
     >
-      {statusLabels[status]}
+      {POLLUTANT_STATUS_DISPLAY_NAMES[status]}
     </Badge>
   )
-}
-
-function formatValue(value: number | null) {
-  return value === null ? '—' : value.toFixed(1)
 }
 
 function StationLocationMap({ lat, lon }: { lat: number; lon: number }) {
@@ -130,7 +127,7 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
       )
     }
 
-    const latest = station.readings.filter(r => r.pm25 !== null)[0] || null
+    const latest = getLatestPm25Reading(station.readings)
 
     if (!latest) {
       return (
