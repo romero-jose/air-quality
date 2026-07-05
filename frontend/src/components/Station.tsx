@@ -1,16 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
 import { Map, Marker } from 'react-map-gl/maplibre'
+
+import { useQuery } from '@tanstack/react-query'
+
 import { MapPin } from 'lucide-react'
-import 'maplibre-gl/dist/maplibre-gl.css'
-import { readingsQuery } from '../api/queries'
-import {
-  pollutantMeta,
-  getReadingValue,
-  getStatus,
-  type Reading,
-} from '../api/airQuality'
-import { MAP_STYLE } from '../constants/map'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+
+import { readingsQuery } from '@/api/queries'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -19,12 +17,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from './ui/table'
-import { Alert, AlertTitle, AlertDescription } from './ui/alert'
-import { Skeleton } from './ui/skeleton'
-import { Badge } from './ui/badge'
-import { cn } from '../utils/styling'
+} from '@/components/ui/table'
+import { MAP_STYLE } from '@/constants/map'
+import { POLLUTANT_META } from '@/constants/pollutants'
 import { statusLabels } from '@/constants/readings'
+import type { Reading } from '@/schemas/reading'
+import { getLatestPm25Reading, getStatus } from '@/utils/readings'
+import { cn } from '@/utils/styling'
+import 'maplibre-gl/dist/maplibre-gl.css'
 
 export type Status = ReturnType<typeof getStatus>
 
@@ -84,8 +84,8 @@ function CurrentConditions({
   lat: number | null
   lon: number | null
 }) {
-  const value = getReadingValue(reading, 'pm25')
-  const status = getStatus(value, 'pm25')
+  const latestReading = getLatestPm25Reading([reading])
+  const status = getStatus(latestReading ? latestReading.pm25 : null, 'pm25')
   const hasLocation = lat !== null && lon !== null
 
   return (
@@ -95,10 +95,10 @@ function CurrentConditions({
           <CardTitle>{stationName}</CardTitle>
           <div className="flex flex-wrap items-baseline gap-3">
             <span className="text-4xl font-semibold tabular-nums">
-              {formatValue(value)}
+              {formatValue(latestReading ? latestReading.pm25 : null)}
             </span>
             <span className="text-sm text-muted-foreground">
-              {pollutantMeta.pm25.unit} · {pollutantMeta.pm25.label}
+              {POLLUTANT_META.pm25.unit} · {POLLUTANT_META.pm25.label}
             </span>
             <StatusBadge status={status} />
           </div>
@@ -170,7 +170,7 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
                   <TableHead>Date</TableHead>
                   <TableHead>Hour</TableHead>
                   <TableHead className="text-right">
-                    {pollutantMeta.pm25.label} ({pollutantMeta.pm25.unit})
+                    {POLLUTANT_META.pm25.label} ({POLLUTANT_META.pm25.unit})
                   </TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Preliminary</TableHead>
@@ -178,7 +178,7 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
               </TableHeader>
               <TableBody>
                 {station.readings.map((reading: Reading) => {
-                  const value = getReadingValue(reading, 'pm25')
+                  const value = reading.pm25
                   const status = getStatus(value, 'pm25')
 
                   return (

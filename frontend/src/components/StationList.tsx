@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import { stationsQuery } from '../api/queries'
+
 import { Link } from '@tanstack/react-router'
-import { Card, CardContent } from './ui/card'
-import { Alert, AlertTitle, AlertDescription } from './ui/alert'
-import { Skeleton } from './ui/skeleton'
-import { buttonVariants } from './ui/button'
-import { cn } from '../utils/styling'
+
+import { stationsQuery } from '@/api/queries'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { buttonVariants } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/utils/styling'
 
 const stationLinkClassName = cn(
   buttonVariants({ variant: 'ghost' }),

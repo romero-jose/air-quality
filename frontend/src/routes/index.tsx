@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+
 import { StationsMap } from '@/components/StationsMap'
 
 const IndexComponent = () => (

@@ -6,5 +6,32 @@
   "printWidth": 80,
   "arrowParens": "avoid",
   "bracketSpacing": true,
-  "useTabs": false
+  "useTabs": false,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "^react$",
+    "^react-dom$",
+    "^@tanstack/react-query$",
+    "^@tanstack/react-router$",
+    "^@tanstack/react-router-devtools$",
+    "^@base-ui/react$",
+    "^@fontsource-variable/inter$",
+    "^@tailwindcss/vite$",
+    "^@tanstack/router-plugin$",
+    "^class-variance-authority$",
+    "^clsx$",
+    "^lucide-react$",
+    "^maplibre-gl$",
+    "^react-map-gl$",
+    "^shadcn$",
+    "^tailwind-merge$",
+    "^tailwindcss$",
+    "^tw-animate-css$",
+    "^zod$",
+    "^[@/components/ui/]",
+    "^[@/]",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }

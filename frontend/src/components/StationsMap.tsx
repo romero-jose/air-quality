@@ -1,34 +1,32 @@
+import { Map, Marker, NavigationControl, Popup } from 'react-map-gl/maplibre'
+
 import { useMemo, useState } from 'react'
+
 import { useQuery } from '@tanstack/react-query'
+
 import { Link } from '@tanstack/react-router'
-import { Map, Marker, Popup, NavigationControl } from 'react-map-gl/maplibre'
-import 'maplibre-gl/dist/maplibre-gl.css'
-import { readingsQuery } from '../api/queries'
+
+import { readingsQuery } from '@/api/queries'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Skeleton } from '@/components/ui/skeleton'
+import { MAP_STYLE, SANTIAGO_CENTER } from '@/constants/map'
 import {
-  getReadingValue,
-  getStatus,
-  formatDateTime,
-  pollutantMeta,
-  type StationReadings,
-} from '../api/airQuality'
-import { Alert, AlertTitle, AlertDescription } from './ui/alert'
-import { Skeleton } from './ui/skeleton'
-import { MAP_STYLE, SANTIAGO_CENTER } from '../constants/map'
+  POLLUTANT_META,
+  POLLUTANT_STATUS,
+  POLLUTANT_STATUS_DISPLAY_NAMES,
+} from '@/constants/pollutants'
 import { statusLabels } from '@/constants/readings'
-import '../styles/map.css'
+import type { StationReadings } from '@/schemas/reading'
+import '@/styles/map.css'
+import { formatMarkerValue, formatValue } from '@/utils/common'
+import {
+  formatDateTime,
+  getLatestPm25Reading,
+  getStatus,
+} from '@/utils/readings'
+import 'maplibre-gl/dist/maplibre-gl.css'
 
-type Status = ReturnType<typeof getStatus>
-type LocatedStation = StationReadings & { lat: number; lon: number }
-
-const legendOrder: Status[] = ['good', 'caution', 'unhealthy', 'missing']
-
-function formatValue(value: number | null) {
-  return value === null ? '—' : value.toFixed(1)
-}
-
-function formatMarkerValue(value: number | null) {
-  return value === null ? '—' : Math.round(value).toString()
-}
+type LocatedStationReadings = StationReadings & { lat: number; lon: number }
 
 export const StationsMap = () => {
   const stationsResult = useQuery(readingsQuery({ limit: 1 }))
@@ -39,7 +37,7 @@ export const StationsMap = () => {
   const stationsWithLocation = useMemo(() => {
     if (!stationsResult.data) return []
     return stationsResult.data.filter(
-      (station): station is LocatedStation =>
+      (station): station is LocatedStationReadings =>
         station.lat !== null && station.lon !== null,
     )
   }, [stationsResult.data])
@@ -77,8 +75,8 @@ export const StationsMap = () => {
         <NavigationControl position="top-right" showCompass={false} />
 
         {stationsWithLocation.map(station => {
-          const latest = station.readings[0]
-          const value = latest ? getReadingValue(latest, 'pm25') : null
+          const latestReading = getLatestPm25Reading(station.readings)
+          const value = latestReading ? latestReading.pm25 : null
           const status = getStatus(value, 'pm25')
 
           return (
@@ -97,7 +95,7 @@ export const StationsMap = () => {
                 className="station-marker"
                 data-status={status}
                 data-active={selectedStationId === station.id}
-                aria-label={`${station.name}: PM2.5 ${formatValue(value)} ${pollutantMeta.pm25.unit}, ${statusLabels[status]}`}
+                aria-label={`${station.name}: PM2.5 ${formatValue(value)} ${POLLUTANT_META.pm25.unit}, ${statusLabels[status]}`}
               >
                 {status === 'unhealthy' && (
                   <span className="station-marker-pulse" aria-hidden="true" />
@@ -139,11 +137,11 @@ function StationPopupContent({
   station,
   onClose,
 }: {
-  station: LocatedStation
+  station: LocatedStationReadings
   onClose: () => void
 }) {
-  const latest = station.readings[0]
-  const value = latest ? getReadingValue(latest, 'pm25') : null
+  const latestReading = getLatestPm25Reading(station.readings)
+  const value = latestReading ? latestReading.pm25 : null
   const status = getStatus(value, 'pm25')
 
   return (
@@ -164,16 +162,18 @@ function StationPopupContent({
         {station.name}
         <span className="station-popup-code">{station.code}</span>
       </Link>
-      {latest ? (
+      {latestReading ? (
         <div className="station-popup-reading">
           <span className="station-popup-value" data-status={status}>
-            {formatValue(value)} <small>{pollutantMeta.pm25.unit}</small>
+            {formatValue(value)} <small>{POLLUTANT_META.pm25.unit}</small>
           </span>
           <div className="station-popup-meta">
             <span data-status={status} className="station-popup-status">
-              {statusLabels[status]}
+              {POLLUTANT_STATUS_DISPLAY_NAMES[status]}
             </span>
-            <span className="station-popup-time">{formatDateTime(latest)}</span>
+            <span className="station-popup-time">
+              {formatDateTime(latestReading)}
+            </span>
           </div>
         </div>
       ) : (
@@ -186,10 +186,10 @@ function StationPopupContent({
 function MapLegend() {
   return (
     <div className="map-legend">
-      {legendOrder.map(status => (
+      {POLLUTANT_STATUS.map(status => (
         <div key={status} className="map-legend-item">
           <span className="map-legend-dot" data-status={status} />
-          {statusLabels[status]}
+          {POLLUTANT_STATUS_DISPLAY_NAMES[status]}
         </div>
       ))}
     </div>

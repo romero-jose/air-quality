@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+
 import { Station } from '../../components/Station'
 
 export const Route = createFileRoute('/stations/$stationCode')({
