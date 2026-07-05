@@ -20,6 +20,7 @@
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "strict": true,
+    "strictNullChecks": true,
     "target": "ES2023",
     "useDefineForClassFields": true,
     "verbatimModuleSyntax": true,
