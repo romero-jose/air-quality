@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { readingsQuery } from '@/api/queries'
-
-import { Station } from '../../components/Station'
+import { Station } from '@/components/Station'
 
 export const Route = createFileRoute('/stations/$stationCode')({
   loader: ({ context: { queryClient }, params: { stationCode } }) => {

@@ -9,12 +9,11 @@ import {
 
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
+import { buttonVariants } from '@/components/ui/button'
+import TanStackQueryDevtools from '@/integrations/tanstack-query/devtools'
+import styleCss from '@/style.css?url'
+import { cn } from '@/utils/styling'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-
-import { buttonVariants } from '../components/ui/button'
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-import styleCss from '../style.css?url'
-import { cn } from '../utils/styling'
 
 const navLinkClassName = cn(
   buttonVariants({ variant: 'ghost' }),
