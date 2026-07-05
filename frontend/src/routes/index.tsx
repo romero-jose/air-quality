@@ -11,7 +11,7 @@ const IndexComponent = () => (
 
 export const Route = createFileRoute('/')({
   loader: ({ context: { queryClient } }) => {
-    return queryClient.ensureQueryData(readingsQuery({ limit: 1 }))
+    return queryClient.ensureQueryData(readingsQuery({ limit: 10 }))
   },
   component: IndexComponent,
 })

@@ -28,7 +28,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 type LocatedStationReadings = StationReadings & { lat: number; lon: number }
 
 export const StationsMap = () => {
-  const stationsResult = useSuspenseQuery(readingsQuery({ limit: 1 }))
+  const stationsResult = useSuspenseQuery(readingsQuery({ limit: 10 }))
   const [selectedStationId, setSelectedStationId] = useState<number | null>(
     null,
   )
