@@ -3,9 +3,11 @@ import 'dotenv/config'
 import { createApp } from './app.js'
 import { createDb } from './db/client.js'
 import { runIngestion, startIngestionWorker, type IngestionWorker } from './ingestion/worker.js'
+import { createLogger } from './logging.js'
 
-const { client, db } = createDb()
-const app = createApp({ db })
+const logger = createLogger()
+const { client, db } = createDb({ logger })
+const app = createApp({ db, logger })
 
 const getPort = () => {
   const raw = process.env.PORT
@@ -21,31 +23,36 @@ const getPort = () => {
 
 const main = async () => {
   if (process.env.RUN_ONCE === 'true') {
-    await runIngestion(db)
+    await runIngestion(db, { logger: logger.child({ component: 'ingestion' }) })
     await client.end()
     return
   }
 
+  const ingestionLogger = logger.child({ component: 'ingestion' })
   const ingestionWorker: IngestionWorker | null =
-    process.env.DISABLE_INGESTION === 'true' ? null : await startIngestionWorker(db)
+    process.env.DISABLE_INGESTION === 'true'
+      ? null
+      : await startIngestionWorker(db, { logger: ingestionLogger })
 
   const shutdown = async () => {
+    logger.info('shutdown started')
     ingestionWorker?.stop()
     await app.close()
     await client.end()
+    logger.info('shutdown finished')
     process.exit(0)
   }
 
   process.on('SIGINT', () => {
     shutdown().catch((error: unknown) => {
-      console.error('[shutdown] failed:', error)
+      logger.error({ err: error }, 'shutdown failed')
       process.exit(1)
     })
   })
 
   process.on('SIGTERM', () => {
     shutdown().catch((error: unknown) => {
-      console.error('[shutdown] failed:', error)
+      logger.error({ err: error }, 'shutdown failed')
       process.exit(1)
     })
   })
@@ -57,7 +64,7 @@ const main = async () => {
 }
 
 main().catch(async (error: unknown) => {
-  console.error('[app] fatal error:', error)
+  logger.fatal({ err: error }, 'fatal app error')
   await app.close()
   await client.end()
   process.exit(1)

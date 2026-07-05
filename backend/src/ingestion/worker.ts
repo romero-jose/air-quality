@@ -1,4 +1,5 @@
 import type { Db } from "../db/client.js";
+import type { AppLogger } from "../logging.js";
 import { ingestSincaReadings } from "./sinca.js";
 
 const DEFAULT_INGESTION_INTERVAL_MS = 15 * 60 * 1000;
@@ -19,45 +20,59 @@ const getIngestionIntervalMs = () => {
   return interval;
 };
 
-export const runIngestion = async (db: Db) => {
+type IngestionOptions = {
+  logger: AppLogger;
+};
+
+export const runIngestion = async (db: Db, { logger }: IngestionOptions) => {
   const startedAt = new Date();
-  console.log(`[ingestion] started at ${startedAt.toISOString()}`);
+  logger.info({ startedAt: startedAt.toISOString() }, "ingestion started");
 
   const result = await ingestSincaReadings(db);
 
-  console.log(
-    `[ingestion] finished: stations=${result.stations} scraped=${result.scrapedReadings} written=${result.writtenReadings} failed=${result.failedStations.length}`,
+  logger.info(
+    {
+      stations: result.stations,
+      scrapedReadings: result.scrapedReadings,
+      writtenReadings: result.writtenReadings,
+      failedStations: result.failedStations.length,
+    },
+    "ingestion finished",
   );
 
   for (const failure of result.failedStations) {
-    console.error(`[ingestion] station ${failure.code} failed: ${failure.error}`);
+    logger.error({ stationCode: failure.code, error: failure.error }, "station ingestion failed");
   }
 };
 
-export const startIngestionWorker = async (db: Db) => {
+export const startIngestionWorker = async (db: Db, { logger }: IngestionOptions) => {
   let ingestionRunning = false;
+  const intervalMs = getIngestionIntervalMs();
 
-  await runIngestion(db);
+  await runIngestion(db, { logger });
 
   const interval = setInterval(() => {
     if (ingestionRunning) {
-      console.warn("[ingestion] previous run is still active; skipping this tick");
+      logger.warn("previous ingestion run is still active; skipping this tick");
       return;
     }
 
     ingestionRunning = true;
-    runIngestion(db)
+    runIngestion(db, { logger })
       .catch((error: unknown) => {
-        console.error("[ingestion] unexpected failure:", error);
+        logger.error({ err: error }, "unexpected ingestion failure");
       })
       .finally(() => {
         ingestionRunning = false;
       });
-  }, getIngestionIntervalMs());
+  }, intervalMs);
+
+  logger.info({ intervalMs }, "ingestion worker started");
 
   return {
     stop: () => {
       clearInterval(interval);
+      logger.info("ingestion worker stopped");
     },
   };
 };

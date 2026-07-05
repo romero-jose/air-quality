@@ -2,17 +2,19 @@ import cors from "@fastify/cors";
 import Fastify from "fastify";
 
 import type { Db } from "./db/client.js";
+import type { AppLogger } from "./logging.js";
 import { healthRoutes } from "./routes/health.js";
 import { readingsRoutes } from "./routes/readings.js";
 import { stationsRoutes } from "./routes/stations.js";
 
 type CreateAppOptions = {
   db: Db;
+  logger: AppLogger;
 };
 
-export const createApp = ({ db }: CreateAppOptions) => {
+export const createApp = ({ db, logger }: CreateAppOptions) => {
   const app = Fastify({
-    logger: true,
+    loggerInstance: logger,
   });
 
   void app.register(cors, {

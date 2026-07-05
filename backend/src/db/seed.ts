@@ -2,6 +2,7 @@ import "dotenv/config";
 
 import { createDb } from "./client.js";
 import { stations } from "./schema.js";
+import { createLogger } from "../logging.js";
 
 const seedStations = [
   {
@@ -22,7 +23,8 @@ const seedStations = [
   },
 ];
 
-const { client, db } = createDb();
+const logger = createLogger().child({ component: "seed" });
+const { client, db } = createDb({ logger });
 
 try {
   const seededStations = [];
@@ -53,7 +55,7 @@ try {
     seededStations.push(seededStation);
   }
 
-  console.log("Seeded stations:", seededStations);
+  logger.info({ stations: seededStations }, "seeded stations");
 } finally {
   await client.end();
 }
