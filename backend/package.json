@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/index.js",
+    "start": "node --import ./instrument.mjs dist/index.js",
     "ingest:once": "RUN_ONCE=true tsx src/index.ts",
     "db:seed": "tsx src/db/seed.ts",
     "db:generate": "drizzle-kit generate",
@@ -21,6 +21,8 @@
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
+    "@sentry/node": "^10.63.0",
+    "@sentry/profiling-node": "^10.63.0",
     "@types/node": "^26.0.1",
     "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
