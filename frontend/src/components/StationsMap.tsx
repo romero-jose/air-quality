@@ -2,7 +2,7 @@ import { Map, Marker, NavigationControl, Popup } from 'react-map-gl/maplibre'
 
 import { useMemo, useState } from 'react'
 
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { Link } from '@tanstack/react-router'
 
