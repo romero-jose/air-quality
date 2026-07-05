@@ -1,20 +1,18 @@
-import { ReactNode } from 'react'
-
-import { QueryClient } from '@tanstack/react-query'
-import { QueryClientProvider } from '@tanstack/react-query'
+import type { QueryClient } from '@tanstack/react-query'
 
 import {
   HeadContent,
   Link,
-  Outlet,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
 
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
-import { ThemeProvider } from '../components/theme-provider'
+import { TanStackDevtools } from '@tanstack/react-devtools'
+
 import { buttonVariants } from '../components/ui/button'
+import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import styleCss from '../style.css?url'
 import { cn } from '../utils/styling'
 
@@ -23,86 +21,85 @@ const navLinkClassName = cn(
   'data-[status=active]:bg-secondary data-[status=active]:text-secondary-foreground',
 )
 
-function AppShell() {
-  return (
-    <>
-      <header className="sticky top-0 z-10 border-b bg-background">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 p-4">
-          <Link
-            to="/"
-            className="font-heading text-lg font-semibold hover:text-muted-foreground"
-          >
-            Santiago Air Quality
-          </Link>
-          <nav className="flex gap-1">
-            <Link
-              to="/"
-              activeOptions={{ exact: true }}
-              className={navLinkClassName}
-            >
-              Home
-            </Link>
-            <Link
-              to="/stations"
-              activeOptions={{ exact: true }}
-              className={navLinkClassName}
-            >
-              Stations
-            </Link>
-          </nav>
-        </div>
-      </header>
-      <main className="mx-auto w-full max-w-5xl p-4">
-        <Outlet />
-      </main>
-      <TanStackRouterDevtools position="bottom-right" />
-    </>
-  )
+interface MyRouterContext {
+  queryClient: QueryClient
 }
 
-const RootComponent = () => {
-  const { queryClient } = Route.useRouteContext()
+const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
 
-  return (
-    <RootDocument>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="dark" storageKey="air-quality-theme">
-          <AppShell />
-        </ThemeProvider>
-      </QueryClientProvider>
-    </RootDocument>
-  )
-}
+export const Route = createRootRouteWithContext<MyRouterContext>()({
+  head: () => ({
+    meta: [
+      {
+        charSet: 'utf-8',
+      },
+      {
+        name: 'viewport',
+        content: 'width=device-width, initial-scale=1',
+      },
+      {
+        title: 'TanStack Start Starter',
+      },
+    ],
+    links: [
+      {
+        rel: 'stylesheet',
+        href: styleCss,
+      },
+    ],
+  }),
+  shellComponent: RootDocument,
+})
 
-function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body>
-        {children}
+      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
+        <header className="sticky top-0 z-10 border-b bg-background">
+          <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 p-4">
+            <Link
+              to="/"
+              className="font-heading text-lg font-semibold hover:text-muted-foreground"
+            >
+              Santiago Air Quality
+            </Link>
+            <nav className="flex gap-1">
+              <Link
+                to="/"
+                activeOptions={{ exact: true }}
+                className={navLinkClassName}
+              >
+                Home
+              </Link>
+              <Link
+                to="/stations"
+                activeOptions={{ exact: true }}
+                className={navLinkClassName}
+              >
+                Stations
+              </Link>
+            </nav>
+          </div>
+        </header>
+        <main className="mx-auto w-full max-w-5xl p-4">{children}</main>
+        <TanStackDevtools
+          config={{
+            position: 'bottom-right',
+          }}
+          plugins={[
+            {
+              name: 'Tanstack Router',
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+            TanStackQueryDevtools,
+          ]}
+        />
         <Scripts />
       </body>
     </html>
   )
 }
-
-export interface RootRouteContext {
-  queryClient: QueryClient
-}
-
-export const Route = createRootRouteWithContext<RootRouteContext>()({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1.0',
-      },
-      { title: 'Santiago Air Quality' },
-    ],
-    links: [{ rel: 'stylesheet', href: styleCss }],
-  }),
-  component: RootComponent,
-})
