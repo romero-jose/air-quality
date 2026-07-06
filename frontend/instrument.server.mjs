@@ -9,4 +9,3 @@ Sentry.init({
     // httpBodies: [],
   },
 })
-

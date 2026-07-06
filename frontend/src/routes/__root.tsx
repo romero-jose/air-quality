@@ -9,6 +9,7 @@ import {
 
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
+import { ThemeProvider } from '@/components/theme-provider'
 import { buttonVariants } from '@/components/ui/button'
 import TanStackQueryDevtools from '@/integrations/tanstack-query/devtools'
 import styleCss from '@/style.css?url'
@@ -23,8 +24,6 @@ const navLinkClassName = cn(
 interface MyRouterContext {
   queryClient: QueryClient
 }
-
-const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
@@ -45,7 +44,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         rel: 'stylesheet',
         href: styleCss,
       },
-          { rel: 'icon', type: 'image/png', sizes: '256x256', href: '/favicon.png' },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '256x256',
+        href: '/favicon.png',
+      },
     ],
   }),
   shellComponent: RootDocument,
@@ -55,36 +59,37 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
-        <header className="sticky top-0 z-10 border-b bg-background">
-          <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 p-4">
-            <Link
-              to="/"
-              className="font-heading text-lg font-semibold hover:text-muted-foreground"
-            >
-              Santiago Air Quality
-            </Link>
-            <nav className="flex gap-1">
+      <body>
+        <ThemeProvider defaultTheme="system" storageKey="theme">
+          <header className="sticky top-0 z-10 border-b bg-background">
+            <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 p-4">
               <Link
                 to="/"
-                activeOptions={{ exact: true }}
-                className={navLinkClassName}
+                className="font-heading text-lg font-semibold hover:text-muted-foreground"
               >
-                Home
+                Santiago Air Quality
               </Link>
-              <Link
-                to="/stations"
-                activeOptions={{ exact: true }}
-                className={navLinkClassName}
-              >
-                Stations
-              </Link>
-            </nav>
-          </div>
-        </header>
+              <nav className="flex gap-1">
+                <Link
+                  to="/"
+                  activeOptions={{ exact: true }}
+                  className={navLinkClassName}
+                >
+                  Home
+                </Link>
+                <Link
+                  to="/stations"
+                  activeOptions={{ exact: true }}
+                  className={navLinkClassName}
+                >
+                  Stations
+                </Link>
+              </nav>
+            </div>
+          </header>
+        </ThemeProvider>
         <main className="mx-auto w-full max-w-5xl p-4">{children}</main>
         <TanStackDevtools
           config={{

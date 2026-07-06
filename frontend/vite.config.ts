@@ -25,7 +25,6 @@ const config = defineConfig(({ mode }) => {
         org: 'na-5vj',
         project: 'air-quality-frontend',
         authToken: env.VITE_SENTRY_AUTH_TOKEN,
-
       }),
     ],
     resolve: { tsconfigPaths: true },
