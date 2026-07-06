@@ -35,3 +35,7 @@ export type Reading = z.infer<typeof readingSchema>
 export type StationReadings = z.infer<
   typeof readingsResponseSchema
 >['data'][number]
+export type LocatedStationReadings = StationReadings & {
+  lat: number
+  lon: number
+}

@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { readingsQuery } from '@/api/queries'
-import { StationsMap } from '@/components/StationsMap'
+import { Stations } from '#/components/Stations'
 
 const IndexComponent = () => (
   <div className="flex flex-col gap-4">
-    <StationsMap />
+    <Stations />
   </div>
 )
 
