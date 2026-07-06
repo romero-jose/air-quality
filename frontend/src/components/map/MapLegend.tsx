@@ -1,5 +1,7 @@
-import { POLLUTANT_STATUS, POLLUTANT_STATUS_DISPLAY_NAMES } from '@/constants/pollutants';
-
+import {
+  POLLUTANT_STATUS,
+  POLLUTANT_STATUS_DISPLAY_NAMES,
+} from '@/constants/pollutants'
 
 export function MapLegend() {
   return (
@@ -11,5 +13,5 @@ export function MapLegend() {
         </div>
       ))}
     </div>
-  );
+  )
 }

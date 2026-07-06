@@ -1,19 +1,27 @@
-import { POLLUTANT_META, POLLUTANT_STATUS_DISPLAY_NAMES } from '#/constants/pollutants';
-import { formatValue } from '#/utils/common';
-import { getLatestPm25Reading, getStatus, formatDateTime } from '#/utils/readings';
-import { Link } from '@tanstack/react-router';
-import type { LocatedStationReadings } from '#/schemas/reading';
+import {
+  POLLUTANT_META,
+  POLLUTANT_STATUS_DISPLAY_NAMES,
+} from '#/constants/pollutants'
+import type { LocatedStationReadings } from '#/schemas/reading'
+import { formatValue } from '#/utils/common'
+import {
+  formatDateTime,
+  getLatestPm25Reading,
+  getStatus,
+} from '#/utils/readings'
 
+import { Link } from '@tanstack/react-router'
 
 export function StationPopupContent({
-  station, onClose,
+  station,
+  onClose,
 }: {
-  station: LocatedStationReadings;
-  onClose: () => void;
+  station: LocatedStationReadings
+  onClose: () => void
 }) {
-  const latestReading = getLatestPm25Reading(station.readings);
-  const value = latestReading ? latestReading.pm25 : null;
-  const status = getStatus(value, 'pm25');
+  const latestReading = getLatestPm25Reading(station.readings)
+  const value = latestReading ? latestReading.pm25 : null
+  const status = getStatus(value, 'pm25')
 
   return (
     <div className="station-popup-card">
@@ -51,5 +59,5 @@ export function StationPopupContent({
         <p className="station-popup-empty">No readings available</p>
       )}
     </div>
-  );
+  )
 }
