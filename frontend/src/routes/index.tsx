@@ -11,8 +11,8 @@ const IndexComponent = () => (
 )
 
 export const Route = createFileRoute('/')({
-  loader: ({ context: { queryClient } }) => {
-    queryClient.prefetchQuery(readingsQuery({ limit: 10 }))
+  loader: async ({ context: { queryClient } }) => {
+    await queryClient.ensureQueryData(readingsQuery({ limit: 10 }))
   },
   headers: () => ({
     'Cache-Control':
