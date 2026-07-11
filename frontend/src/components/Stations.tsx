@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react'
+import { Suspense } from 'react'
 
 import { useSuspenseQuery } from '@tanstack/react-query'
 
@@ -6,9 +6,7 @@ import { readingsQuery } from '@/api/queries'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 
-const StationsMap = lazy(() =>
-  import('@/components/map').then(m => ({ default: m.StationsMap })),
-)
+import { StationsMap } from './map'
 
 export const Stations = () => {
   const stationsResult = useSuspenseQuery(readingsQuery({ limit: 10 }))
