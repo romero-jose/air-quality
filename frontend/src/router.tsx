@@ -2,8 +2,10 @@ import { QueryClient } from '@tanstack/react-query'
 
 import { createRouter } from '@tanstack/react-router'
 
+import * as Sentry from '@sentry/tanstackstart-react'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 
+import { RouteError } from './components/RouteError'
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
@@ -16,6 +18,7 @@ export function getRouter() {
       queryClient,
     },
     defaultStaleTime: 5000,
+    defaultErrorComponent: RouteError,
     scrollRestoration: true,
   })
 
@@ -23,6 +26,12 @@ export function getRouter() {
     router,
     queryClient,
   })
+
+  if (!router.isServer) {
+    Sentry.addIntegration(
+      Sentry.tanstackRouterBrowserTracingIntegration(router),
+    )
+  }
 
   return router
 }
