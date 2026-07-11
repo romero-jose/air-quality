@@ -23,11 +23,16 @@ import {
   POLLUTANT_STATUS_DISPLAY_NAMES,
   type PollutantStatus,
 } from '@/constants/pollutants'
-import { type Reading } from '@/schemas/reading'
+import { type Reading, type StationReadings } from '@/schemas/reading'
 import { formatValue } from '@/utils/common'
 import { getLatestPm25Reading, getStatus } from '@/utils/readings'
 import { cn } from '@/utils/styling'
 import 'maplibre-gl/dist/maplibre-gl.css'
+
+const PM25 = POLLUTANT_META.pm25
+
+const stationHeading = (station: StationReadings) =>
+  `${station.name} (${station.code})`
 
 function StatusBadge({ status }: { status: PollutantStatus }) {
   return (
@@ -71,38 +76,32 @@ function StationLocationMap({ lat, lon }: { lat: number; lon: number }) {
 }
 
 function CurrentConditions({
-  stationName,
-  reading,
-  lat,
-  lon,
+  station,
+  latest,
 }: {
-  stationName: string
-  reading: Reading
-  lat: number | null
-  lon: number | null
+  station: StationReadings
+  latest: Reading
 }) {
-  const latestReading = getLatestPm25Reading([reading])
-  const status = getStatus(latestReading ? latestReading.pm25 : null, 'pm25')
-  const hasLocation = lat !== null && lon !== null
+  const status = getStatus(latest.pm25, 'pm25')
 
   return (
     <Card className="overflow-hidden p-0">
       <div className="flex flex-col sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-3 p-6">
-          <CardTitle>{stationName}</CardTitle>
+          <CardTitle>{station.name}</CardTitle>
           <div className="flex flex-wrap items-baseline gap-3">
             <span className="text-4xl font-semibold tabular-nums">
-              {formatValue(latestReading ? latestReading.pm25 : null)}
+              {formatValue(latest.pm25)}
             </span>
             <span className="text-sm text-muted-foreground">
-              {POLLUTANT_META.pm25.unit} · {POLLUTANT_META.pm25.label}
+              {PM25.unit} · {PM25.label}
             </span>
             <StatusBadge status={status} />
           </div>
         </div>
-        {hasLocation && (
+        {station.lat !== null && station.lon !== null && (
           <div className="h-48 w-full sm:h-auto sm:w-72">
-            <StationLocationMap lat={lat} lon={lon} />
+            <StationLocationMap lat={station.lat} lon={station.lon} />
           </div>
         )}
       </div>
@@ -133,9 +132,7 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>
-            {station.name} ({station.code})
-          </CardTitle>
+          <CardTitle>{stationHeading(station)}</CardTitle>
         </CardHeader>
         <CardContent className="text-muted-foreground">
           No readings available for this station.
@@ -146,18 +143,11 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <CurrentConditions
-        stationName={station.name}
-        reading={latest}
-        lat={station.lat}
-        lon={station.lon}
-      />
+      <CurrentConditions station={station} latest={latest} />
 
       <Card>
         <CardHeader>
-          <CardTitle>
-            {station.name} ({station.code})
-          </CardTitle>
+          <CardTitle>{stationHeading(station)}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -167,7 +157,7 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
                 <TableHead>Date</TableHead>
                 <TableHead>Hour</TableHead>
                 <TableHead className="text-right">
-                  {POLLUTANT_META.pm25.label} ({POLLUTANT_META.pm25.unit})
+                  {PM25.label} ({PM25.unit})
                 </TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Preliminary</TableHead>
