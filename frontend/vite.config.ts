@@ -18,7 +18,13 @@ const config = defineConfig(({ mode }) => {
     plugins: [
       devtools(),
       tailwindcss(),
-      tanstackStart(),
+      tanstackStart({
+        server: {
+          build: {
+            inlineCss: true,
+          },
+        },
+      }),
       nitro(),
       viteReact(),
       sentryTanstackStart({
