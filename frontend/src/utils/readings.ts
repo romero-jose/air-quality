@@ -28,3 +28,9 @@ export const formatDateTime = (reading: Reading | undefined) => {
 
   return `${reading.date} ${reading.hour.slice(0, 5)}`
 }
+
+export const formatShortDate = (date: string) =>
+  new Date(`${date}T00:00:00`).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+  })

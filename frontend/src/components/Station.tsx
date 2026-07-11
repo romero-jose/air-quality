@@ -25,7 +25,11 @@ import {
 } from '@/constants/pollutants'
 import { type Reading, type StationReadings } from '@/schemas/reading'
 import { formatValue } from '@/utils/common'
-import { getLatestPm25Reading, getStatus } from '@/utils/readings'
+import {
+  formatShortDate,
+  getLatestPm25Reading,
+  getStatus,
+} from '@/utils/readings'
 import { cn } from '@/utils/styling'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -160,28 +164,25 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
                   {PM25.label} ({PM25.unit})
                 </TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Preliminary</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {station.readings.map((reading: Reading) => {
-                const value = reading.pm25
-                const status = getStatus(value, 'pm25')
-
-                return (
-                  <TableRow key={reading.id}>
-                    <TableCell>{reading.date}</TableCell>
-                    <TableCell>{reading.hour.slice(0, 5)}</TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {formatValue(value)}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={status} />
-                    </TableCell>
-                    <TableCell>{reading.preliminary ? 'Yes' : 'No'}</TableCell>
-                  </TableRow>
-                )
-              })}
+              {station.readings.map((reading: Reading) => (
+                <TableRow key={reading.id}>
+                  <TableCell className="whitespace-nowrap text-muted-foreground">
+                    {formatShortDate(reading.date)}
+                  </TableCell>
+                  <TableCell className="tabular-nums">
+                    {reading.hour.slice(0, 5)}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {formatValue(reading.pm25)}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={getStatus(reading.pm25, 'pm25')} />
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </CardContent>
