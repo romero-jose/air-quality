@@ -1,4 +1,5 @@
 import { Map, Marker } from 'react-map-gl/maplibre'
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 
 import { useSuspenseQuery } from '@tanstack/react-query'
 
@@ -8,6 +9,12 @@ import { readingsQuery } from '@/api/queries'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
 import {
   Table,
   TableBody,
@@ -89,8 +96,8 @@ function CurrentConditions({
   const status = getStatus(latest.pm25, 'pm25')
 
   return (
-    <Card className="overflow-hidden p-0">
-      <div className="flex flex-col sm:flex-row">
+    <Card className="overflow-hidden p-0 lg:flex-1 lg:basis-0">
+      <div className="flex h-full flex-col sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-3 p-6">
           <CardTitle>{station.name}</CardTitle>
           <div className="flex flex-wrap items-baseline gap-3">
@@ -109,6 +116,59 @@ function CurrentConditions({
           </div>
         )}
       </div>
+    </Card>
+  )
+}
+
+const chartConfig = {
+  pm25: { label: PM25.label, color: 'var(--primary)' },
+} satisfies ChartConfig
+
+function Pm25TrendChart({ readings }: { readings: Reading[] }) {
+  const data = readings
+    .map(reading => ({
+      hour: reading.hour.slice(0, 5),
+      label: `${formatShortDate(reading.date)} · ${reading.hour.slice(0, 5)}`,
+      pm25: reading.pm25,
+    }))
+    .reverse()
+
+  return (
+    <Card className="lg:flex-1 lg:basis-0">
+      <CardHeader>
+        <CardTitle>
+          {PM25.label} trend ({PM25.unit})
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig} className="h-48 w-full">
+          <LineChart data={data} margin={{ left: 4, right: 12, top: 8 }}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="hour"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              minTickGap={24}
+            />
+            <YAxis
+              width={32}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={4}
+            />
+            <ChartTooltip content={<ChartTooltipContent labelKey="label" />} />
+            <Line
+              dataKey="pm25"
+              type="monotone"
+              stroke="var(--color-pm25)"
+              strokeWidth={2}
+              connectNulls
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </ChartContainer>
+      </CardContent>
     </Card>
   )
 }
@@ -147,7 +207,10 @@ export const Station = ({ stationCode }: { stationCode: string }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <CurrentConditions station={station} latest={latest} />
+      <div className="flex flex-col gap-4 lg:flex-row">
+        <CurrentConditions station={station} latest={latest} />
+        <Pm25TrendChart readings={station.readings} />
+      </div>
 
       <Card>
         <CardHeader>
