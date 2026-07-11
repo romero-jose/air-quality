@@ -14,6 +14,7 @@ import { buttonVariants } from '@/components/ui/button'
 import TanStackQueryDevtools from '@/integrations/tanstack-query/devtools'
 import styleCss from '@/style.css?url'
 import { cn } from '@/utils/styling'
+import interLatinFont from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 const navLinkClassName = cn(
@@ -40,6 +41,23 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
     ],
     links: [
+      {
+        rel: 'preconnect',
+        href: 'https://basemaps.cartocdn.com',
+        crossOrigin: 'anonymous',
+      },
+      {
+        rel: 'preconnect',
+        href: 'https://tiles.basemaps.cartocdn.com',
+        crossOrigin: 'anonymous',
+      },
+      {
+        rel: 'preload',
+        href: interLatinFont,
+        as: 'font',
+        type: 'font/woff2',
+        crossOrigin: 'anonymous',
+      },
       {
         rel: 'stylesheet',
         href: styleCss,
