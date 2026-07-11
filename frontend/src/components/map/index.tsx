@@ -47,6 +47,7 @@ export function StationsMap({ stations }: { stations: StationReadings[] }) {
         mapStyle={MAP_STYLE}
         style={{ width: '100%', height: '100%' }}
         onClick={() => setSelectedStationId(null)}
+        attributionControl={false}
       >
         <NavigationControl position="top-right" showCompass={false} />
 
