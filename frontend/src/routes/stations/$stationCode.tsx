@@ -9,6 +9,10 @@ export const Route = createFileRoute('/stations/$stationCode')({
       readingsQuery({ stationCode, limit: 10 }),
     )
   },
+  headers: () => ({
+    'Cache-Control':
+      'public, max-age=0, s-maxage=300, stale-while-revalidate=3600',
+  }),
   component: RouteComponent,
 })
 
