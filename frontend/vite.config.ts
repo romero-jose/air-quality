@@ -24,6 +24,14 @@ const config = defineConfig(({ mode }) => {
             inlineCss: true,
           },
         },
+        prerender: {
+          enabled: true,
+          crawlLinks: true,
+        },
+        sitemap: {
+          enabled: true,
+          host: env.VERCEL_URL,
+        },
       }),
       nitro(),
       viteReact(),
