@@ -3,7 +3,7 @@ import Map, { Marker, NavigationControl, Popup } from 'react-map-gl/maplibre'
 
 import { useMemo, useState } from 'react'
 
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { MAP_STYLE, SANTIAGO_CENTER } from '@/constants/map'
 import {
@@ -24,7 +24,7 @@ export function InteractiveMap() {
     null,
   )
 
-  const stationsResult = useQuery(readingsQuery({ limit: 10 }))
+  const stationsResult = useSuspenseQuery(readingsQuery({ limit: 10 }))
 
   const filteredStations = useMemo(
     () =>
