@@ -20,6 +20,8 @@ export function getRouter() {
     defaultStaleTime: 5000,
     defaultErrorComponent: RouteError,
     scrollRestoration: true,
+    defaultPendingMs: 0,
+    defaultPendingMinMs: 0,
   })
 
   setupRouterSsrQueryIntegration({
