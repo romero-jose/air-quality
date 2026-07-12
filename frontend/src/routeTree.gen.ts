@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StationsIndexRouteImport } from './routes/stations/index'
 import { Route as StationsStationCodeRouteImport } from './routes/stations/$stationCode'
 
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,36 +37,47 @@ const StationsStationCodeRoute = StationsStationCodeRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/stations/$stationCode': typeof StationsStationCodeRoute
   '/stations/': typeof StationsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/stations/$stationCode': typeof StationsStationCodeRoute
   '/stations': typeof StationsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/stations/$stationCode': typeof StationsStationCodeRoute
   '/stations/': typeof StationsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/stations/$stationCode' | '/stations/'
+  fullPaths: '/' | '/robots.txt' | '/stations/$stationCode' | '/stations/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/stations/$stationCode' | '/stations'
-  id: '__root__' | '/' | '/stations/$stationCode' | '/stations/'
+  to: '/' | '/robots.txt' | '/stations/$stationCode' | '/stations'
+  id: '__root__' | '/' | '/robots.txt' | '/stations/$stationCode' | '/stations/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   StationsStationCodeRoute: typeof StationsStationCodeRoute
   StationsIndexRoute: typeof StationsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   StationsStationCodeRoute: StationsStationCodeRoute,
   StationsIndexRoute: StationsIndexRoute,
 }

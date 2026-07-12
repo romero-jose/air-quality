@@ -30,7 +30,7 @@ const config = defineConfig(({ mode }) => {
         },
         sitemap: {
           enabled: true,
-          host: env.VERCEL_URL,
+          host: env.APP_URL,
         },
       }),
       nitro(),
