@@ -1,16 +1,16 @@
+import { readingsQuery } from '#/api/queries'
 import Map, { Marker, NavigationControl, Popup } from 'react-map-gl/maplibre'
 
 import { useMemo, useState } from 'react'
+
+import { useQuery } from '@tanstack/react-query'
 
 import { MAP_STYLE, SANTIAGO_CENTER } from '@/constants/map'
 import {
   POLLUTANT_META,
   POLLUTANT_STATUS_DISPLAY_NAMES,
 } from '@/constants/pollutants'
-import {
-  type LocatedStationReadings,
-  type StationReadings,
-} from '@/schemas/reading'
+import { type LocatedStationReadings } from '@/schemas/reading'
 import '@/styles/map.css'
 import { formatMarkerValue, formatValue } from '@/utils/common'
 import { getLatestPm25Reading, getStatus } from '@/utils/readings'
@@ -19,18 +19,20 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { MapLegend } from './MapLegend'
 import { StationPopupContent } from './StationPopupContent'
 
-export function InteractiveMap({ stations }: { stations: StationReadings[] }) {
+export function InteractiveMap() {
   const [selectedStationId, setSelectedStationId] = useState<number | null>(
     null,
   )
 
+  const stationsResult = useQuery(readingsQuery({ limit: 10 }))
+
   const filteredStations = useMemo(
     () =>
-      stations.filter(
+      stationsResult.data?.filter(
         (station): station is LocatedStationReadings =>
           station.lat !== null && station.lon !== null,
-      ),
-    [stations],
+      ) ?? [],
+    [stationsResult.data],
   )
 
   const selectedStation = useMemo(
