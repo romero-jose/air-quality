@@ -40,6 +40,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       {
         title: 'Santiago Air Quality',
       },
+      {
+        name: 'description',
+        content:
+          'Real-time air quality readings across Santiago, Chile. Powered by the Chilean Ministry of Environment and the Chilean Air Quality Monitoring Network.',
+      },
     ],
     links: [
       {
