@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/tanstackstart-react'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 
 import { RouteError } from './components/RouteError'
+import { initSentry } from './instrument-client'
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
@@ -30,9 +31,18 @@ export function getRouter() {
   })
 
   if (!router.isServer) {
-    Sentry.addIntegration(
-      Sentry.tanstackRouterBrowserTracingIntegration(router),
-    )
+    const startSentry = () => {
+      initSentry()
+      Sentry.addIntegration(
+        Sentry.tanstackRouterBrowserTracingIntegration(router),
+      )
+    }
+
+    if (typeof window.requestIdleCallback === 'function') {
+      window.requestIdleCallback(startSentry, { timeout: 2000 })
+    } else {
+      window.setTimeout(startSentry, 0)
+    }
   }
 
   return router

@@ -1,0 +1,10 @@
+import * as Sentry from '@sentry/tanstackstart-react'
+
+export function initSentry() {
+  Sentry.init({
+    dsn: 'https://b74292bf9a2c7c2743da7913f2ea8726@o4511684992237568.ingest.us.sentry.io/4511685206605824',
+    enabled: import.meta.env.PROD,
+    environment: import.meta.env.MODE,
+    tracesSampleRate: 1.0,
+  })
+}
