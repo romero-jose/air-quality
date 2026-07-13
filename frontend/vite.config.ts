@@ -15,6 +15,9 @@ const config = defineConfig(({ mode }) => {
     server: {
       port: 3000,
     },
+    build: {
+      sourcemap: true,
+    },
     plugins: [
       devtools(),
       tailwindcss(),
