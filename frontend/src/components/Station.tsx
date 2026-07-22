@@ -43,7 +43,9 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 const PM25 = POLLUTANT_META.pm25
 
 const stationHeading = (station: StationReadings) =>
-  `${station.name} (${station.code})`
+  station.municipality
+    ? `Air Quality in ${station.municipality} — ${station.name}`
+    : station.name
 
 function StatusBadge({ status }: { status: PollutantStatus }) {
   return (
