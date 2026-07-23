@@ -28,7 +28,7 @@ const config = defineConfig(({ mode }) => {
           },
         },
         prerender: {
-          enabled: true,
+          enabled: false,
           crawlLinks: true,
         },
         sitemap: {
